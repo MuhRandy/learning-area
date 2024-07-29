@@ -258,6 +258,69 @@ This is for implementing anything requiring progress reporting, such as the perc
 
 The content inside the `<progress>` element is a fallback for browsers that don't support the element and for screen readers to vocalize it.
 
+# Styling web form
+
+- Easy-to-style
+  - `<form>`
+  - `<fieldset>` and `<legend>`
+  - Single-line text `<input>`s (e.g. type text, url, email), except for `<input type="search">`.
+  - Multi-line `<textarea>`
+  - Buttons (both `<input>` and `<button>`)
+  - `<label>`
+  - `<output>`
+- Harder-to-style
+  - Checkboxes and radio buttons
+  - `<input type="search">`
+- Having internals can't be styled in CSS alone
+  - `<input type="color">`
+  - Date-related controls such as `<input type="datetime-local">`
+  - `<input type="range">`
+  - `<input type="file">`
+  - Elements involved in creating dropdown widgets, including `<select>`, `<option>`, `<optgroup>` and `<datalist>`.
+  - `<progress>` and `<meter>`
+
+## Fonts and text
+
+CSS font and text features can be used easily with any widget (and yes, you can use `@font-face` with form widgets). However, browser behavior is often inconsistent. By default, some widgets do not inherit font-family and font-size from their parents. Many browsers use the system's default appearance instead. To make your forms' appearance consistent with the rest of your content, you can add the following rules to your stylesheet:
+
+```css
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+```
+
+There's a lot of debate as to whether forms look better using the system default styles, or customized styles designed to match your content. This decision is yours to make, as the designer of your site, or web application.
+
+## Box sizing
+
+All text fields have complete support for every property related to the CSS box model, such as `width`, `height`, `padding`, `margin`, and `border`. As before, however, browsers rely on the system default styles when displaying these widgets. It's up to you to define how you wish to blend them into your content. If you want to keep the native look and feel of the widgets, you'll face a little difficulty if you want to give them a consistent size.
+
+This is because each widget has its own rules for `border`, `padding`, and `margin`. To give the same size to several different widgets, you can use the `box-sizing` property along with some consistent values for other properties:
+
+```css
+input,
+textarea,
+select,
+button {
+  width: 150px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+```
+
+## Legend placement
+
+The `<legend>` element is okay to style, but it can be a bit tricky to control the placement of it. By default, it is always positioned over the top border of its `<fieldset>` parent, near the top left corner. To position it somewhere else, for example inside the fieldset somewhere, or near the bottom left corner, you need to rely on the positioning.
+
+The `<fieldset>` needs to be positioned too, so that the `<legend>` is positioned relative to it (otherwise the `<legend>` would be positioned relative to the `<body>`).
+
+The `<legend>` element is very important for accessibility — it will be spoken by assistive technologies as part of the label of each form element inside the fieldset — but using a technique like the one above is fine. The legend contents will still be spoken in the same way; it is just the visual position that has changed.
+
 # Sources
 
 - [MDN](https://developer.mozilla.org/en-US/)
