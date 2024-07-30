@@ -321,6 +321,301 @@ The `<fieldset>` needs to be positioned too, so that the `<legend>` is positione
 
 The `<legend>` element is very important for accessibility — it will be spoken by assistive technologies as part of the label of each form element inside the fieldset — but using a technique like the one above is fine. The legend contents will still be spoken in the same way; it is just the visual position that has changed.
 
+# Advance form styling
+
+## Taming search boxes
+
+Safari search boxes have some styling restrictions — you can't adjust their height or font-size freely. This can be fixed using `appearance: none;`, which disables the default appearance. Interestingly, setting border/background on the search field also fixes this problem.
+
+## Styling checkboxes and radio buttons
+
+The sizes of checkboxes and radio buttons are not meant to be changed with their default designs, and browsers react very differently when you try. Which can removed the default appearance of a checkbox or radio button altogether with `appearance:none;`.
+
+We can use the `:checked` and `:disabled` pseudo-classes to change the appearance of our custom checkbox as its state changes.
+
+- `:checked` — the checkbox (or radio button) is in a checked state — the user has clicked/activated it.
+- `:disabled` — the checkbox (or radio button) is in a disabled state — it cannot be interacted with.
+
+## What can be done about the "ugly" elements?
+
+The "ugly" controls — the ones that are really hard to thoroughly style. In short, these are drop-down boxes, complex control types like `color` and `datetime-local`, and feedback—oriented controls like `<progress>` and `<meter>`.
+
+We've applied some global normalizing CSS to all the controls and their labels, to get them to size in the same way, adopt their parent font, etc.:
+
+```css
+button,
+label,
+input,
+select,
+progress,
+meter {
+  display: block;
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px;
+  height: 30px;
+}
+```
+
+We also added some uniform shadow and rounded corners to the controls on which it made sense:
+
+```css
+input[type="text"],
+input[type="datetime-local"],
+input[type="color"],
+select {
+  box-shadow: inset 1px 1px 3px #ccc;
+  border-radius: 5px;
+}
+```
+
+### Selects and datalists
+
+Two things are slightly more problematic. First of all, the select's "arrow" icon that indicates it is a dropdown differs across browsers. It also tends to change if you increase the size of the select box, or resize in an ugly fashion. To fix this we used `appearance: none` to get rid of the icon altogether.
+
+We then created our own icon using generated content. We put an extra wrapper around the control, because `::before`/`::after` don't work on `<select>` elements (because their content is fully controlled by the browser).
+
+We then use generated content to generate a little down arrow, and put it in the right place using positioning on extra wrapper.
+
+The second, slightly more important issue is that you don't have control over the box that appears containing the options when you click on the `<select>` box to open it. You can inherit the font set on the parent, but you won't be able to set things like spacing and colors. The same is true for the autocomplete list that appears with `<datalist>`.
+
+If you really need full control over the option styling, you'll have to either use some kind of library to generate a custom control, or build your own custom control, or in the case of select use the multiple attribute, which makes all the options appear on the page, sidestepping this particular problem.
+
+### Date input types
+
+The date/time input types (`datetime-local`, `time`, `week`, `month`) all have the same major associated issue. The actual containing box is as easy to style as any text input.
+
+However, the internal parts of the control (e.g. the popup calendar that you use to pick a date, the spinner that you can use to increment/decrement values) are not stylable at all, and you can't get rid of them using `appearance: none;`. If you really need full control over the styling, you'll have to either use some kind of library to generate a custom control, or build your own.
+
+### Range input types
+
+`<input type="range">` is annoying to style. You can use something like the following to remove the default slider track completely and replace it with a custom style (a thin red track, in this case):
+
+```css
+input[type="range"] {
+  appearance: none;
+  background: red;
+  height: 2px;
+  padding: 0;
+  outline: 1px solid transparent;
+}
+```
+
+However, it is very difficult to customize the style of the range control's drag handle — to get full control over range styling you'll need to use a whole bunch of complex CSS code, including multiple non-standard, browser-specific pseudo-elements.
+
+### Color input types
+
+Input controls of type color are not too bad. In supporting browsers, they tend to just give you a block of solid color with a small border.
+
+You can remove the border, just leaving the block of color, using something like this:
+
+```css
+input[type="color"] {
+  border: 0;
+  padding: 0;
+}
+```
+
+However, a custom solution is the only way to get anything significantly different.
+
+### File input types
+
+The only problem with file pickers is that the button provided that you press to open the file picker is completely unstylable — it can't be sized or colored, and it won't even accept a different font.
+
+One way around this is to take advantage of the fact that if you have a label associated with a form control, clicking the label will activate the control. So you could hide the actual form input using something like this:
+
+```css
+input[type="file"] {
+  height: 0;
+  padding: 0;
+  opacity: 0;
+}
+```
+
+And then style the label to act like a button, which when pressed will open the file picker as expected:
+
+```css
+label[for="file"] {
+  box-shadow: 1px 1px 3px #ccc;
+  background: linear-gradient(to bottom, #eee, #ccc);
+  border: 1px solid rgb(169, 169, 169);
+  border-radius: 5px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+label[for="file"]:hover {
+  background: linear-gradient(to bottom, #fff, #ddd);
+}
+
+label[for="file"]:active {
+  box-shadow: inset 1px 1px 3px #ccc;
+}
+```
+
+### Meters and progress bars
+
+We can set them to the desired width relatively accurately. But beyond that, they are really difficult to style in any way. They don't handle height settings consistently between each other and between browsers, you can color the background, but not the foreground bar, and setting `appearance: none` on them makes things worse, not better.
+
+It is easier to just create your own custom solution for these features, if you want to be able to control the styling, or use a third-party solution such as [progressbar.js](https://kimmobrunfeldt.github.io/progressbar.js/#examples).
+
+# UI Pseudo-classes
+
+## Styling inputs based on whether they are required or not
+
+One of the most basic concepts regarding client-side form validation is whether a form input is required (it has to be filled in before the form can be submitted) or optional.
+
+`<input>`, `<select>`, and `<textarea>` elements have a required attribute available which, when set, means that you have to fill in that control before the form will successfully submit.
+
+You can match these two states using the `:required` and `:optional` pseudo-classes.
+
+Using color alone is not great when we are signaling required versus optional status for colorblind people, also the standard convention on the web for required status is an asterisk (`*`), or the word "required" being associated with the controls in question.
+
+## Using generated content with pseudo-classes
+
+We can use the `::before` and `::after` pseudo-elements along with the `content` property to make a chunk of content appear before or after the affected element. The chunk of content is not added to the DOM, so it may be invisible to some screen readers. Because it is a pseudo-element, it can be targeted with styles in the same way that any actual DOM node can.
+
+This is really useful when you want to add a visual indicator to an element, such as a label or icon, when alternative indicators are also available to ensure accessibility for all users. For example, we use generated content to handle the placement and animation of the a custom radio button's inner circle when a radio button is selected:
+
+```css
+input[type="radio"]::before {
+  display: block;
+  content: " ";
+  width: 10px;
+  height: 10px;
+  border-radius: 6px;
+  background-color: red;
+  font-size: 1.2em;
+  transform: translate(3px, 3px) scale(0);
+  transform-origin: center;
+  transition: all 0.3s ease-in;
+}
+
+input[type="radio"]:checked::before {
+  transform: translate(3px, 3px) scale(1);
+  transition: all 0.3s cubic-bezier(0.25, 0.25, 0.56, 2);
+}
+```
+
+This is really useful — screen readers already let their users know when a radio button or checkbox they encounter is checked/selected, so you don't want them to read out another DOM element that indicates selection — that could be confusing. Having a purely visual indicator solves this problem.
+
+Not all `<input>` types support having generated content put on them. All input types that show dynamic text in them, such as `text`, `password`, or `button`, don't display generated content. Others, including `range`, `color`, `checkbox`, etc., display generated content.
+
+Back to our required/optional example from before, this time we'll not alter the appearance of the input itself — we'll use generated content to add an indicating label.
+
+First of all, we'll add a paragraph to the top of the form to say what you are looking for:
+
+```html
+<p>Required fields are labeled with "required".</p>
+```
+
+Screen reader users will get "required" read out as an extra bit of information when they get to each required input, while sighted users will get our label.
+
+As previously mentioned, text inputs don't support generated content, so we add an empty `<span>` to hang the generated content on:
+
+```html
+<div>
+  <label for="fname">First name: </label>
+  <input id="fname" name="fname" type="text" required />
+  <span></span>
+</div>
+```
+
+The immediate problem with this was that the span was dropping onto a new line below the input because the input and label are both set with `width: 100%`. To fix this we style the parent `<div>` to become a flex container, but also tell it to wrap its contents onto new lines if the content becomes too long:
+
+```css
+fieldset > div {
+  margin-bottom: 20px;
+  display: flex;
+  flex-flow: row wrap;
+}
+```
+
+The effect this has is that the label and input sit on separate lines because they are both `width: 100%`, but the `<span>` has a width of 0 so it can sit on the same line as the input.
+
+Now onto the generated content. We create it using this CSS:
+
+```css
+input + span {
+  position: relative;
+}
+
+input:required + span::after {
+  font-size: 0.7rem;
+  position: absolute;
+  content: "required";
+  color: white;
+  background-color: black;
+  padding: 5px 10px;
+  top: -26px;
+  left: -70px;
+}
+```
+
+We set the `<span>` to `position: relative` so that we can set the generated content to `position: absolute` and position it relative to the `<span>` rather than the `<body>` (The generated content acts as though it is a child node of the element it is generated on, for the purposes of positioning).
+
+Then we give the generated content the content "required", which is what we wanted our label to say, and style and position it as we want.
+
+## Styling controls based on whether their data is valid
+
+You can target form controls using the `:valid` and `:invalid` pseudo-classes. Some points worth bearing in mind:
+
+- Controls with no constraint validation will always be valid, and therefore matched with `:valid`.
+- Controls with required set on them that have no value are counted as invalid — they will be matched with `:invalid` and :required.
+- Controls with built-in validation, such as `<input type="email">` or `<input type="url">` are (matched with) `:invalid` when the data entered into them does not match the pattern they are looking for (but they are valid when empty).
+- Controls whose current value is outside the range limits specified by the min and max attributes are (matched with) `:invalid`, but also matched by `:out-of-range`.
+- There are some other ways to make an element matched by `:valid`/`:invalid`.
+
+## In-range and out-of-range data
+
+`:in-range` and `:out-of-range` match numeric inputs where range limits are specified by the `min` and `max`, when their data is inside or outside the specified range, respectively. Numeric input types are `date`, `month`, `week`, `time`, `datetime-local`, `number`, and `range`.
+
+It is worth noting that inputs whose data is in-range will also be matched by the `:valid` pseudo-class and inputs whose data is out-of-range will also be matched by the `:invalid` pseudo-class. So why have both? The issue is really one of semantics — out-of-range is a more specific type of invalid communication, so you might want to provide a different message for out-of-range inputs, which will be more helpful to users than just saying "invalid". You might even want to provide both.
+
+## Styling enabled and disabled inputs, and read-only and read-write
+
+An enabled element is an element that can be activated; it can be selected, clicked on, typed into, etc. A disabled element on the other hand cannot be interacted with in any way, and its data isn't even sent to the server.
+
+These two states can be targeted using `:enabled` and `:disabled`. Why are disabled inputs useful? Well, sometimes if some data does not apply to a certain user, you might not even want to submit that data when they submit the form. A classic example is a shipping form — commonly you'll get asked if you want to use the same address for billing and shipping; if so, you can just send a single address to the server, and might as well just disable the billing address fields.
+
+We can directly selected the inputs we want to disable using `input[type="text"]:disabled`, but we also wanted to gray out the corresponding text labels. These weren't quite as easy to select, so we've used a class to provide them with that styling.
+
+In a similar manner to `:disabled` and `:enabled`, the `:read-only` and `:read-write` pseudo-classes target two states that form inputs toggle between. Read-only inputs have their values submitted to the server, but the user can't edit them, whereas read-write means they can be edited — their default state.
+
+An input is set to read-only using the `readonly` attribute. As an example, imagine a confirmation page where the developer has sent the details filled in on previous pages over to this page, with the aim of getting the user to check them all in one place, add any final data that is needed, and then confirm the order by submitting. At this point, all the final form data can be sent to the server in one go.
+
+## Radio and checkbox states — checked, default, indeterminate
+
+When checked, they will be matched by the `:checked` pseudo-class.
+
+The most common use of this is to add a different style onto the checkbox or radio button when it is checked, in cases where you've removed the system default styling with `appearance: none;` and want to build the styles back up yourself.
+
+The `:default` pseudo-class matches radios/checkboxes that are checked by default, on page load, even when unchecked. This could be useful for adding an indicator to a list of options to remind the user what the defaults (or starting options) were, in case they want to reset their choices.
+
+Also, the radios/checkboxes mentioned above will be matched by the `:indeterminate` pseudo-class when they are in a state where they are neither checked nor unchecked. But what does this mean? Elements that are indeterminate include:
+
+- `<input/radio>` inputs, when all radio buttons in a same-named group are unchecked
+- `<input/checkbox>` inputs whose indeterminate property is set to true via JavaScript
+- `<progress>` elements that have no value.
+
+This isn't something you'll likely use very often. One use case could be an indicator to tell users that they really need to select a radio button before they move on.
+
+## More pseudo-classes
+
+There are a number of other pseudo-classes of interest, and we don't have space to write about them all in detail here. Let's talk about a few more that you should take the time to investigate.
+
+- The `:focus-within` pseudo-class matches an element that has received focus or contains an element that has received focus. This is useful if you want a whole form to highlight in some way when an input inside it is focused.
+- The `:focus-visible` pseudo-class matches focused elements that received focus via keyboard interaction (rather than touch or mouse) — useful if you want to show a different style for keyboard focus compared to mouse (or other) focus.
+- The `:placeholder-shown` pseudo-class matches `<input>` and `<textarea>` elements that have their placeholder showing (i.e. the contents of the placeholder attribute) because the value of the element is empty.
+
+The following are also interesting, but as yet not well-supported in browsers:
+
+- The `:blank` pseudo-class selects empty form controls. `:empty` also matches elements that have no children, like `<input>`, but it is more general — it also matches other void elements like `<br>` and `<hr>`. `:empty` has reasonable browser support; the `:blank` pseudo-class's specification is not yet finished, so it is not yet supported in any browser.
+- The `:user-invalid` pseudo-class, when supported, will be similar to `:invalid`, but with better user experience. If the value is valid when the input receives focus, the element may match `:invalid` as the user enters data if the value is temporarily invalid, but will only match `:user-invalid` when the element loses focus. If the value was originally invalid, it will match both `:invalid` and `:user-invalid` for the whole duration of the focus. In a similar manner to `:invalid`, it will stop matching `:user-invalid` if the value does become valid.
+
 # Sources
 
 - [MDN](https://developer.mozilla.org/en-US/)
