@@ -1,3 +1,21 @@
+# Form
+
+Forms are the “money pages.” They’re how e-commerce sites sell their products, how SaaS companies collect payment for their service, and how non-profit groups raise money online.
+
+There are two aspects of a functional HTML form: the frontend user interface and the backend server. The former is the appearance of the form (as defined by HTML and CSS), while the latter is the code that processes it (storing data in a database, sending an email, etc).
+
+## Create a form
+
+Every HTML form begins with the aptly named `<form>` element. It accepts a number of attributes, but the most important ones are `action` and `method`.
+
+The `action` attribute defines the URL that processes the form. It’s where the input collected by the form is sent when the user clicks the Submit button. This is typically a special URL defined by your web server that knows how to process the data. Common backend technologies for processing forms include Node.js, PHP, and Ruby on Rails. By leaving the action attribute blank will telling the form to submit to the same URL.
+
+The `method` attribute can be either `post` or `get`, both of which define how the form is submitted to the backend server. This is largely dependent on how your web server wants to handle the form, but the general rule of thumb is to use post when you’re changing data on the server, reserving get for when you’re only getting data.
+
+First, we have a container `<div>` to help with styling. This is pretty common for separating input elements. Second, we have a `<label>`, which you can think of as another semantic HTML element for form. A label’s for attribute must match the `id` attribute of its associated `<input/>` element. Remember that ID selectors are bad—the `id` attribute here is only for connecting it to a `<label>` element.
+
+Conceptually, an `<input/>` element represents a “variable” that gets sent to the backend server. The `name` attribute defines the name of this variable, and the `value` is whatever the user entered into the text field. Note that you can pre-populate this value by adding a `value` attribute to an `<input/>` element.
+
 # Basic Control
 
 ## Input fields
