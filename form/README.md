@@ -16,6 +16,78 @@ First, we have a container `<div>` to help with styling. This is pretty common f
 
 Conceptually, an `<input/>` element represents a “variable” that gets sent to the backend server. The `name` attribute defines the name of this variable, and the `value` is whatever the user entered into the text field. Note that you can pre-populate this value by adding a `value` attribute to an `<input/>` element.
 
+## HTML5 Input Fields
+
+HTML offers:
+
+- `<textarea>` for multiline text boxes
+- `<select>` for a drop-down list of options
+- `<button>` for … buttons
+
+But you’ll use `<input>` most often:
+
+`<input type="text" name="username" />`
+
+The type attribute sets the control type, and there’s a large choice of options:
+
+- `button`, a button with no default behavior
+- `checkbox`, a check/tick box
+- `color`, a color picker
+- `date`, a date picker for the year, month, and day
+- `datetime-local`, a date and time picker
+- `email`, an email entry field
+- `file`, a file picker
+- `hidden`, a hidden field
+- `image`, a button which displays the image defined by the `src` attribute
+- `month`, a month and year picker
+- `number`, a number entry field
+- `password`, a password entry field with obscured text
+- `radio`, a radio button
+- `range`, a slider control
+- `reset`, a button that resets all form inputs to their default values (but avoid using this, as it’s rarely useful)
+- `search`, a search entry field
+- `submit`, a form submission button
+- `tel`, a telephone number entry field
+- `text`, a text entry field
+- `time`, a time picker with no time zone
+- `url`, a URL entry field
+- `week`, a week number and year picker
+
+Other useful `<input>` attributes include:
+
+- `accept`, file upload type
+- `alt`, alternative text for the image types
+- `autocomplete`, hint for field auto-completion
+- `autofocus`, focus field on page load
+- `capture`, media capture input method
+- `checked`, checkbox/radio is checked
+- `disabled`, disable the control (it won’t be validated or have its value submitted)
+- `form`, associate with a form using this ID
+- `formaction`, URL for submission on submit and image buttons
+- `inputmode`, data type hint
+- `list`, ID of `<datalist>` autocomplete options
+- `max`, maximum value
+- `maxlength`, maximum string length
+- `min`, minimum value
+- `minlength`, minimum string length
+- `name`, name of control, as submitted to server
+- `pattern`, a regular expression pattern, such as `[A-Z]+` for one or more uppercase characters
+- `placeholder`, placeholder text when the field value is empty
+- `readonly`, the field is not editable, but it will still be validated and submitted
+- `required`, the field is required
+- `size`, the size of the control (often overridden in CSS)
+- `spellcheck`, set true or false spell-checking
+- `src`, image URL
+- `step`, incremental values in numbers and ranges
+- `type`, field type
+- `value`, the initial value
+
+As well as input types, HTML5 provides read-only outputs:
+
+- `output`: a text result of a calculation or user action
+- `progress`: a progress bar with `value` and `max` attributes
+- `meter`: a scale which can change between green, amber, and red depending on the values set for the `value`, `min`, `max`, `low`, `high`, and `optimum` attributes.
+
 # Basic Control
 
 ## Input fields
@@ -634,6 +706,107 @@ The following are also interesting, but as yet not well-supported in browsers:
 - The `:blank` pseudo-class selects empty form controls. `:empty` also matches elements that have no children, like `<input>`, but it is more general — it also matches other void elements like `<br>` and `<hr>`. `:empty` has reasonable browser support; the `:blank` pseudo-class's specification is not yet finished, so it is not yet supported in any browser.
 - The `:user-invalid` pseudo-class, when supported, will be similar to `:invalid`, but with better user experience. If the value is valid when the input receives focus, the element may match `:invalid` as the user enters data if the value is temporarily invalid, but will only match `:user-invalid` when the element loses focus. If the value was originally invalid, it will match both `:invalid` and `:user-invalid` for the whole duration of the focus. In a similar manner to `:invalid`, it will stop matching `:user-invalid` if the value does become valid.
 
+# Form validation
+
+Validations allow us to set specific constraints or rules that determine what data users can enter into an input. When a user enters data that breaks the rules, a message will appear, providing feedback on what was wrong with the entered data and how to fix it.
+
+You can stop browser validation by:
+
+- adding a `novalidate` attribute to the `<form>` element
+- adding a `formnovalidate` attribute to the submission button or image
+
+## Required validation
+
+We will often want to ensure specific fields have been filled in before submitting the form, for example, the email and password in a login form. To make a field required, we add the `required` attribute to it.
+
+To ensure a good user experience and to meet accessibility guidelines, we should always indicate which fields are required. This will often be done by adding an asterisk(`*`) to the required field label.
+
+## Text length validations
+
+- Minimum length validation: give the form control a `minlength` attribute with an integer value that represents the minimum number of characters we want to allow in the form control.
+- Maximum length validation: give the form control a `maxlength` attribute with an integer value which represents the maximum number of characters we want to allow in the form control
+
+## Number range validations
+
+- Minimum value validation: give the form control a `min` attribute with an integer value which represents the minimum number we want the form control to accept.
+- Maximum value validation: give the form control a `max` attribute with an integer value which represents the maximum number we want the form control to accept.
+
+The `min` and `max` attributes only work with number-based form controls such as the number, dates and time inputs. Some real-world use cases for using these validations would be limiting the quantity on a product order form or choosing the number of passengers on a flight booking form.
+
+## Pattern validations
+
+To ensure we get the correct information from users, we will often want to ensure data matches a particular pattern. Real-world applications would be checking if a credit card number or a zipcode is in the correct format.
+
+To add a pattern validation, we give the form control a `pattern` attribute with a regular expression as the value.
+
+It is good practice to use a `placeholder` attribute to show users an example of the expected pattern they need to enter.
+
+The `pattern` attribute can only be used on `<input>` elements. Some input elements already validate data that matches a certain pattern (email and url input field).
+
+Regular expression example:
+
+- a — Matches one character that is a (not b, not aa, and so on).
+- abc — Matches a, followed by b, followed by c.
+- ab?c — Matches a, optionally followed by a single b, followed by c. (ac or abc)
+- ab\*c — Matches a, optionally followed by any number of bs, followed by c. (ac, abc, abbbbbc, and so on).
+- a|b — Matches one character that is a or b.
+- abc|xyz — Matches exactly abc or exactly xyz (but not abcxyz or a or y, and so on).
+
+## Styling validations
+
+We can target form controls that have passed or failed validations using the `:valid` and `:invalid` pseudo-classes.
+
+# Client-side form validation
+
+Client-side validation is an initial check and an important feature of good user experience; by catching invalid data on the client-side, the user can fix it straight away.
+
+Client-side validation should not be considered an exhaustive security measure! Your apps should always perform security checks on any form-submitted data on the server-side as well as the client-side, because client-side validation is too easy to bypass, so malicious users can still easily send bad data through to your server.
+
+Reasons to validating our forms:
+
+- **We want to get the right data, in the right format**. Our applications won't work properly if our users' data is stored in the wrong format, is incorrect, or is omitted altogether.
+- **We want to protect our users' data**. Forcing our users to enter secure passwords makes it easier to protect their account information.
+- **We want to protect ourselves**. There are many ways that malicious users can misuse unprotected forms to damage the application.
+
+## Different types of client-side validation
+
+- **Built-in form validation** uses HTML form validation features. This validation generally doesn't require much JavaScript. Built-in form validation has better performance than JavaScript, but it is not as customizable as JavaScript validation.
+- **JavaScript** validation is coded using JavaScript. This validation is completely customizable, but you need to create it all (or use a library).
+
+## CSS Validation Styling
+
+- `:focus`, the field with focus
+- `:focus-within`, an element contains a field with focus (yes, it’s a parent selector!)
+- `:focus-visible`, an element has focus owing to keyboard navigation, so a focus ring or more evident styling is necessary
+- `:required`, a field with a required attribute
+- `:optional`, a field without a required attribute
+- `:valid`, a field that has passed validation
+- `:invalid`, a field that has not passed validation
+- `:user-valid`, a field that has passed validation after the user has interacted with it (Firefox only)
+- `:user-invalid`, a field that hasn’t passed validation after the user has interacted with it (Firefox only)
+- `:in-range`, the value is within range on a number or range input
+- `:out-of-range`, the value is out of range on a number or range input
+- `:disabled`, a field with a disabled attribute
+- `:enabled`, a field without a disabled attribute
+- `:read-only`, a field with a read-only attribute
+- `:read-write`, a field without a read-only attribute
+- `:checked`, a checked checkbox or radio button
+- `:indeterminate`, an indeterminate checkbox or radio state, such as when all radio buttons are unchecked
+- `:default`, the default submit button or image
+
+# Form Finesse
+
+Forms are the basis of all web applications and developers spend considerable time manipulating user input. Constraint validation is well supported: browsers can handle most checks and show appropriate input options.
+
+Recommendations:
+
+- Use the standard HTML input types where possible. Set `min`, `max`, `step`, `minlength`, `maxlength`, `pattern`, `required`, `inputmode`, and `autocomplete` attributes as appropriate.
+- If necessary, use a little JavaScript to enable custom validation and messages.
+- For more complex fields, progressively enhance the standard inputs.
+
 # Sources
 
 - [MDN](https://developer.mozilla.org/en-US/)
+- [internetingishard](https://internetingishard.netlify.app/html-and-css/forms/index.html)
+- [SitePoin](https://www.sitepoint.com/html-forms-constraint-validation-complete-guide/)
+- [The Odin Project](https://www.theodinproject.com/)
