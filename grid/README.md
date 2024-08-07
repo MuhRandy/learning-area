@@ -37,6 +37,30 @@ The gap between grid rows and columns is known as the gutter or alley. Gap sizes
 
 # [DevTools](https://developer.chrome.com/docs/devtools/css/grid/)
 
+# Positioning gird elements
+
+## Lines
+
+Grid lines are what we use to position grid items. Whenever we create grid tracks, grid lines are created implicitly. This is important. Grid lines are only created after our grid tracks have been defined. We can not explicitly create grid lines.
+
+Every track has a start line and an end line. The lines are numbered from left to right and top to bottom starting at 1.
+
+## Cells
+
+**The space in a grid shared by a single row track and a single column track is called a grid cell**. You can think of a grid cell like a _cell in a spreadsheet: a space defined by a row, column coordinate_. By default, each child element of a grid container will occupy one cell.
+
+## Positioning
+
+We positioned grid item using `grid-column-start` and `grid-column-end` or `grid-row-start` and `grid-row-end`. Their property values represent the column or row grid lines we wish it to start and end with.
+
+`grid-column` is just a combination of `grid-column-start` and `grid-column-end` with a slash between the two values. And `grid-row` is the shorthand version for setting an item’s row positioning.
+
+You can combine `grid-row-start` / `grid-column-start` / `grid-row-end` / `grid-column-end` into one line using `grid-area`. But `grid-area` can also refer to a few different things. Instead of using the grid lines to position all the items in a grid, we can create a visual layout of the grid in words. To do this we give each item on the grid a name using `grid-area`. Then we can map out the whole structure with the grid container using `grid-template-areas`. We can even use `.` to indicate empty cells.
+
+Lines value can addresed from backward using minus. For example lines can be addressed as `-1`, and you can count back from there – so the second last line is `-2`.
+
+In addition to specifying the start and end lines by number, you can specify a start line and then the number of tracks you would like the area to span using the `span` keyword. You can also use the span keyword in the value of `grid-row-start`/`grid-row-end` and `grid-column-start`/`grid-column-end`
+
 # Source
 
 - [The Odin Project](https://www.theodinproject.com/)
