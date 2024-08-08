@@ -99,6 +99,18 @@ The difference is only noticeable when there are fewer items than can fill up th
 
 \*Part 4
 
+# Using flexbox and grid
+
+## flexbox
+
+- Content First Design (you begin with clarity of how the content should be, and the layout follows)
+- one-dimensional content, can make it easier to control how that content is positioned
+
+## grid
+
+- Layout First Design (you decide how you want the pieces arranged, then fill in the content)
+- accurately place content on a complex layout in two-dimensions
+
 # Source
 
 - [The Odin Project](https://www.theodinproject.com/)
