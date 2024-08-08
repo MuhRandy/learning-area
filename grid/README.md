@@ -61,6 +61,44 @@ Lines value can addresed from backward using minus. For example lines can be add
 
 In addition to specifying the start and end lines by number, you can specify a start line and then the number of tracks you would like the area to span using the `span` keyword. You can also use the span keyword in the value of `grid-row-start`/`grid-row-end` and `grid-column-start`/`grid-column-end`
 
+# Advance properties
+
+## Repeat
+
+`repeat()` is a CSS function available to the CSS Grid template properties that allows us to define a number of rows or columns and the size we want them to be without having to manually type out each individual track’s size.
+
+## Fractional units
+
+The most basic way to make our grid items dynamic is by using fractional units, also known as `fr`.
+
+The `fr` unit is a way of distributing whatever remaining space is left in the grid. For example, if we have a four-column grid with a total width of 400px and four grid items each on a column track assigned `1fr` as their size, all of the grid items should be given one fraction of that 400px of space, which is 100 pixels.
+
+## Dynamic minimum and maximum sizes
+
+`minmax()` is a CSS function that is specifically used with Grid. It can only be used with the following CSS properties:
+
+- `grid-template-columns`
+- `grid-template-rows`
+- `grid-auto-columns`
+- `grid-auto-rows`
+
+It is a relatively straightforward function that only takes in two arguments:
+
+1. The minimum size the grid track can be
+1. The maximum size the grid track can be
+
+## `auto-fit` and `auto-fill`
+
+These two values are actually a part of the `repeat()` function specification. Here’s the use case: You want to give your grid a number of columns that is flexible based on the size of the grid. For example, if our grid is only `200px` wide, we may only want one column. If it’s `400px` wide, we may want two, and so on.
+
+According to the [W3 specification on auto-fill and auto-fit](https://www.w3.org/TR/css-grid-1/#auto-repeat), both of these functions will return “the largest possible positive integer” without the grid items overflowing their container.
+
+The difference is only noticeable when there are fewer items than can fill up the entirety of the grid row once. When the grid is expanded to a size where another grid item could fit, but there aren’t any left, `auto-fit` will keep the grid items at their max size. Using `auto-fill`, the grid items will snap back down to their min size once the space becomes available to add another grid item, even if there isn’t one to be rendered. They will continue their pattern of growing to max and snapping back to their min as the grid expands and more room becomes available for new grid tracks.
+
+# [Grid properties](https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-properties)
+
+\*Part 4
+
 # Source
 
 - [The Odin Project](https://www.theodinproject.com/)
