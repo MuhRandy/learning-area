@@ -332,27 +332,339 @@ class Foo {}
 class Bar extends calculatorMixin(randomizerMixin(Foo)) {}
 ```
 
-<!-- The basic `class` syntax looks like this:
+# Private properties
+
+Private properties are counterparts of the regular class properties which are public, including class fields, class methods, etc. Private properties get created by using a hash `#` prefix and cannot be legally referenced outside of the class. The privacy encapsulation of these class properties is enforced by JavaScript itself. The only way to access a private property is via dot notation, and you can only do so within the class that defines the private property.
 
 ```javascript
-class MyClass {
-  prop = value; // property
+class ClassWithPrivate {
+  #privateField;
+  #privateFieldWithInitializer = 42;
 
-  constructor(...) { // constructor
-    // ...
+  #privateMethod() {
+    // …
   }
 
-  method(...) {} // method
+  static #privateStaticField;
+  static #privateStaticFieldWithInitializer = 42;
 
-  get something(...) {} // getter method
-  set something(...) {} // setter method
-
-  [Symbol.iterator]() {} // method with computed name (symbol here)
-  // ...
+  static #privateStaticMethod() {
+    // …
+  }
 }
 ```
 
-`MyClass` is technically a function (the one that we provide as `constructor`), while methods, getters and setters are written to `MyClass.prototype`. -->
+There are some additional syntax restrictions:
+
+- All private identifiers declared within a class must be unique. The namespace is shared between static and instance properties. The only exception is when the two declarations define a getter-setter pair.
+- The private identifier cannot be `#constructor`.
+
+## Examples
+
+### Private fields
+
+Private fields include private instance fields and private static fields. Private fields are only accessible from inside the class declaration.
+
+#### Private instance fields
+
+Like their public counterparts, private instance fields:
+
+- are added before the constructor runs in a base class, or immediately after `super()` is invoked in a subclass, and
+- are only available on instances of the class.
+
+```javascript
+class ClassWithPrivateField {
+  #privateField;
+
+  constructor() {
+    this.#privateField = 42;
+  }
+}
+
+class Subclass extends ClassWithPrivateField {
+  #subPrivateField;
+
+  constructor() {
+    super();
+    this.#subPrivateField = 23;
+  }
+}
+
+new Subclass(); // In some dev tools, it shows Subclass {#privateField: 42, #subPrivateField: 23}
+```
+
+#### Private static fields
+
+Like their public counterparts, private static fields:
+
+- are added to the class constructor at class evaluation time, and
+- are only available on the class itself.
+
+```javascript
+class ClassWithPrivateStaticField {
+  static #privateStaticField = 42;
+
+  static publicStaticMethod() {
+    return ClassWithPrivateStaticField.#privateStaticField;
+  }
+}
+
+console.log(ClassWithPrivateStaticField.publicStaticMethod()); // 42
+```
+
+There is a restriction on private static fields: only the class which defines the private static field can access the field. This can lead to unexpected behavior when using this. In the following example, this refers to the Subclass class (not the ClassWithPrivateStaticField class) when we try to call Subclass.publicStaticMethod(), and so causes a TypeError.
+
+```javascript
+class ClassWithPrivateStaticField {
+  static #privateStaticField = 42;
+
+  static publicStaticMethod() {
+    return this.#privateStaticField;
+  }
+}
+
+class Subclass extends ClassWithPrivateStaticField {}
+
+Subclass.publicStaticMethod(); // TypeError: Cannot read private member #privateStaticField from an object whose class did not declare it
+```
+
+Advised to always access private static fields through the class name, not through `this`, so inheritance doesn't break the method.
+
+### Private methods
+
+Private methods include private instance methods and private static methods. Private methods are only accessible from inside the class declaration.
+Private instance methods
+
+Unlike their public counterparts, private instance methods:
+
+- are installed immediately before the instance fields are installed, and
+- are only available on instances of the class, not on its .prototype property.
+
+```javascript
+class ClassWithPrivateMethod {
+  #privateMethod() {
+    return 42;
+  }
+
+  publicMethod() {
+    return this.#privateMethod();
+  }
+}
+
+const instance = new ClassWithPrivateMethod();
+console.log(instance.publicMethod()); // 42
+```
+
+Private getters and setters are also possible, and follow the same syntax requirements as their public getter and setter counterparts.
+
+```javascript
+class ClassWithPrivateAccessor {
+  #message;
+
+  get #decoratedMessage() {
+    return `🎬${this.#message}🛑`;
+  }
+  set #decoratedMessage(msg) {
+    this.#message = msg;
+  }
+
+  constructor() {
+    this.#decoratedMessage = "hello world";
+    console.log(this.#decoratedMessage);
+  }
+}
+
+new ClassWithPrivateAccessor(); // 🎬hello world🛑
+```
+
+Unlike public methods, private methods are not accessible on the .prototype property of their class.
+
+```javascript
+class C {
+  #method() {}
+
+  static getMethod(x) {
+    return x.#method;
+  }
+}
+
+console.log(C.getMethod(new C())); // [Function: #method]
+console.log(C.getMethod(C.prototype)); // TypeError: Receiver must be an instance of class C
+```
+
+#### Private static methods
+
+Like their public counterparts, private static methods:
+
+- are added to the class constructor at class evaluation time, and
+- are only available on the class itself.
+
+```javascript
+class ClassWithPrivateStaticMethod {
+  static #privateStaticMethod() {
+    return 42;
+  }
+
+  static publicStaticMethod() {
+    return ClassWithPrivateStaticMethod.#privateStaticMethod();
+  }
+}
+
+console.log(ClassWithPrivateStaticMethod.publicStaticMethod()); // 42
+```
+
+The same restriction previously mentioned for private static fields holds for private static methods, and similarly can lead to unexpected behavior when using `this`.
+
+### Simulating private constructors
+
+```javascript
+class PrivateConstructor {
+  static #isInternalConstructing = false;
+
+  constructor() {
+    if (!PrivateConstructor.#isInternalConstructing) {
+      throw new TypeError("PrivateConstructor is not constructable");
+    }
+    PrivateConstructor.#isInternalConstructing = false;
+    // More initialization logic
+  }
+
+  static create() {
+    PrivateConstructor.#isInternalConstructing = true;
+    const instance = new PrivateConstructor();
+    return instance;
+  }
+}
+
+new PrivateConstructor(); // TypeError: PrivateConstructor is not constructable
+PrivateConstructor.create(); // PrivateConstructor {}
+```
+
+# `static`
+
+The `static` keyword defines a static method or field for a class, or a static initialization block. Static properties cannot be directly accessed on instances of the class. Instead, they're accessed on the class itself.
+
+Static methods are often utility functions, such as functions to create or clone objects, whereas static properties are useful for caches, fixed-configuration, or any other data you don't need to be replicated across instances.
+
+## Syntax
+
+```javascript
+class ClassWithStatic {
+  static staticField;
+  static staticFieldWithInitializer = value;
+  static staticMethod() {
+    // …
+  }
+}
+```
+
+There are some additional syntax restrictions:
+
+- The name of a static property (field or method) cannot be `prototype`.
+- The name of a class field (static or instance) cannot be `constructor`.
+
+In the field initializer, `this` refers to the current class (which you can also access through its name), and `super` refers to the base class constructor.
+
+```javascript
+class ClassWithStaticField {
+  static baseStaticField = "base static field";
+  static anotherBaseStaticField = this.baseStaticField;
+
+  static baseStaticMethod() {
+    return "base static method output";
+  }
+}
+
+class SubClassWithStaticField extends ClassWithStaticField {
+  static subStaticField = super.baseStaticMethod();
+}
+
+console.log(ClassWithStaticField.anotherBaseStaticField); // "base static field"
+console.log(SubClassWithStaticField.subStaticField); // "base static method output"
+```
+
+## Examples
+
+### Using static members in classes
+
+The following example demonstrates several things:
+
+- How a static member (method or property) is defined on a class.
+- That a class with a static member can be sub-classed.
+- How a static member can and cannot be called.
+
+```javascript
+class Triple {
+  static customName = "Tripler";
+  static description = "I triple any number you provide";
+  static calculate(n = 1) {
+    return n * 3;
+  }
+}
+
+class SquaredTriple extends Triple {
+  static longDescription;
+  static description = "I square the triple of any number you provide";
+  static calculate(n) {
+    return super.calculate(n) * super.calculate(n);
+  }
+}
+
+console.log(Triple.description); // 'I triple any number you provide'
+console.log(Triple.calculate()); // 3
+console.log(Triple.calculate(6)); // 18
+
+const tp = new Triple();
+
+console.log(SquaredTriple.calculate(3)); // 81 (not affected by parent's instantiation)
+console.log(SquaredTriple.description); // 'I square the triple of any number you provide'
+console.log(SquaredTriple.longDescription); // undefined
+console.log(SquaredTriple.customName); // 'Tripler'
+
+// This throws because calculate() is a static member, not an instance member.
+console.log(tp.calculate()); // 'tp.calculate is not a function'
+```
+
+### Calling static members from another static method
+
+In order to call a static method or property within another static method of the same class, you can use the `this` keyword.
+
+```javascript
+class StaticMethodCall {
+  static staticProperty = "static property";
+  static staticMethod() {
+    return `Static method and ${this.staticProperty} has been called`;
+  }
+  static anotherStaticMethod() {
+    return `${this.staticMethod()} from another static method`;
+  }
+}
+StaticMethodCall.staticMethod();
+// 'Static method and static property has been called'
+
+StaticMethodCall.anotherStaticMethod();
+// 'Static method and static property has been called from another static method'
+```
+
+### Calling static members from a class constructor and other methods
+
+Static members are not directly accessible using the `this` keyword from non-static methods. You need to call them using the class name: `CLASSNAME.STATIC_METHOD_NAME()` / `CLASSNAME`.`STATIC_PROPERTY_NAME` or by calling the method as a property of the constructor: `this.constructor.STATIC_METHOD_NAME()` / `this.constructor.STATIC_PROPERTY_NAME`
+
+```javascript
+class StaticMethodCall {
+  constructor() {
+    console.log(StaticMethodCall.staticProperty); // 'static property'
+    console.log(this.constructor.staticProperty); // 'static property'
+    console.log(StaticMethodCall.staticMethod()); // 'static method has been called.'
+    console.log(this.constructor.staticMethod()); // 'static method has been called.'
+  }
+
+  static staticProperty = "static property";
+  static staticMethod() {
+    return "static method has been called.";
+  }
+}
+```
 
 # Opinions regarding the pros and cons of classes
 
@@ -368,9 +680,10 @@ class MyClass {
 1. Concept of classes makes things brittle. Prototypes are better and very flexible.
 1. It guides people away from goodness and power of functional programming.
 
-## [Property getters and setters](https://javascript.info/property-accessors)
+# [Property getters and setters](https://javascript.info/property-accessors)
 
 # Sources
 
 - [opinions regarding the pros and cons of classes](https://rajaraodv.medium.com/is-class-in-es6-the-new-bad-part-6c4e6fe1ee65)
 - [javascript.info](https://javascript.info/)
+- [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes)
