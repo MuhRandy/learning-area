@@ -196,3 +196,7 @@ two.js <-------------- one.js <-------------- three.js
 # CommonJS
 
 CommonJS (CJS) uses syntax like `require` and `module.exports` instead of `import` and `export`. CJS is still used quite a lot in Node.js code, though in recent years, ESM in Node.js has been gaining popularity.
+
+# Sources
+
+- [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/)
