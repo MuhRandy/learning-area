@@ -78,3 +78,7 @@ script {
 }
 ...
 ```
+
+# [Webpack concept](https://webpack.js.org/concepts/)
+
+# [Webpack’s Asset Management guide](https://webpack.js.org/guides/asset-management/)
