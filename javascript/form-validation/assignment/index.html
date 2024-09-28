@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Validation Assignment</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form novalidate>
+      <h1>Form Validation</h1>
+      <label for="mail"
+        ><span>Email : </span>
+        <input id="mail" type="email" name="mail" required />
+        <span class="error">Tes</span>
+      </label>
+
+      <label for="country">
+        <span>Country : </span>
+        <select id="country" name="country">
+          <option value="ch">Switzerland</option>
+          <option value="fr">France</option>
+          <option value="de">Germany</option>
+          <option value="nl">The Netherlands</option>
+        </select>
+        <span class="error"></span>
+      </label>
+
+      <label for="ZIP">
+        <span>ZIP : </span>
+        <input type="text" id="ZIP" required />
+        <span class="error"></span>
+      </label>
+
+      <label for="pwd">
+        <span>Password : </span>
+        <input id="pwd" type="password" name="pwd" minlength="8" required />
+        <span class="error"></span>
+      </label>
+
+      <label for="Cpwd">
+        <span>Confirm Password : </span>
+        <input id="Cpwd" type="password" />
+        <span class="error"></span>
+      </label>
+
+      <button>Submit</button>
+    </form>
+
+    <script src="script.js"></script>
+  </body>
+</html>
