@@ -47,29 +47,29 @@
 
       button.onclick = fetchingGif;
 
-      function fetchingGif() {
+      async function fetchingGif() {
         const request = new Request(
           "https://api.giphy.com/v1/gifs/translate?api_key=XqgCvx6PKYNjEErJY2DZ343cMBciurr4&s=" +
             input.value
         );
 
-        fetch(request)
-          .then((response) => {
-            if (!response.ok)
-              throw new Error(`Response status : ${response.status}`);
+        try {
+          const response = await fetch(request);
 
-            return response.json();
-          })
-          .then((result) => {
-            const data = result.data;
-            if (data.length === 0) {
-              return alert("images not found");
-            }
+          if (!response.ok)
+            throw new Error(`Response status : ${response.status}`);
 
-            img.alt = data.alt_text;
-            img.src = data.images.original.url;
-          })
-          .catch((error) => console.log(error));
+          const { data } = await response.json();
+
+          if (data.length === 0) {
+            return alert("No image matched : " + input.value);
+          }
+
+          img.alt = data.alt_text;
+          img.src = data.images.original.url;
+        } catch (error) {
+          console.log(error);
+        }
       }
     </script>
   </body>
