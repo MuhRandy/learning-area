@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API</title>
+
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-content: center;
+        background-color: rgba(0, 0, 0, 0.6);
+      }
+
+      div {
+        background-color: #fff;
+        padding: 10px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input type="text" />
+      <img src="#" alt="" />
+      <button>New Image</button>
+    </div>
+
+    <script>
+      const input = document.querySelector("input");
+      const img = document.querySelector("img");
+      const button = document.querySelector("button");
+
+      input.value = "cats";
+
+      fetchingGif();
+
+      button.onclick = fetchingGif;
+
+      function fetchingGif() {
+        const request = new Request(
+          "https://api.giphy.com/v1/gifs/translate?api_key=XqgCvx6PKYNjEErJY2DZ343cMBciurr4&s=" +
+            input.value
+        );
+
+        fetch(request)
+          .then((response) => {
+            if (!response.ok)
+              throw new Error(`Response status : ${response.status}`);
+
+            return response.json();
+          })
+          .then((result) => {
+            const data = result.data;
+            if (data.length === 0) {
+              return alert("images not found");
+            }
+
+            img.alt = data.alt_text;
+            img.src = data.images.original.url;
+          })
+          .catch((error) => console.log(error));
+      }
+    </script>
+  </body>
+</html>
