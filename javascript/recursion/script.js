@@ -90,3 +90,57 @@ let doesntHaveIt = contains(nestedObject, "foo"); // false
 
 // console.log(hasIt);
 // console.log(doesntHaveIt);
+
+function totalIntegers(arr) {
+  if (arr.length === 0) return 0;
+
+  let total = 0;
+  const last = arr.pop();
+
+  if (Array.isArray(last)) {
+    total += totalIntegers(last);
+  } else if (Number.isInteger(last)) {
+    total += 1;
+  }
+
+  return total + totalIntegers(arr);
+}
+
+var seven = totalIntegers([[[5], 3], 0, 2, ["foo"], [], [4, [5, 6]]]); // 7
+
+// console.log(seven);
+
+function sumSquares(arr) {
+  let total = 0;
+
+  if (!Array.isArray(arr)) return (total += arr ** 2);
+  if (arr.length === 0) return total;
+  else if (Array.isArray(arr)) {
+    const last = arr.pop();
+    total += sumSquares(last);
+  }
+
+  return total + sumSquares(arr);
+}
+
+// var l = [1, 2, 3];
+// console.log(sumSquares(l)); // 1 + 4 + 9 = 14
+
+// l = [[1, 2], 3];
+// console.log(sumSquares(l)); // 1 + 4 + 9 = 14
+
+// l = [[[[[[[[[1]]]]]]]]];
+// console.log(sumSquares(l)); // 1 = 1
+
+// l = [10, [[10], 10], [10]];
+// console.log(sumSquares(l)); // 100 + 100 + 100 + 100 = 400
+
+function replicate(amount, num) {
+  if (amount < 1) return [];
+
+  return [num].concat(replicate(amount - 1, num));
+}
+
+console.log(replicate(3, 5)); // [5, 5, 5]
+console.log(replicate(1, 69)); // [69]
+console.log(replicate(-2, 6)); // []
