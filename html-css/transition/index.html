@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transition</title>
+
+    <style>
+      .square {
+        width: 80px;
+        height: 80px;
+        background-color: #deb887;
+        display: grid;
+        place-content: center;
+        transition: transform 1.5s ease, border-radius 1.5s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="square"></div>
+
+    <script>
+      const square = document.querySelector(".square");
+
+      document.addEventListener("click", (e) => {
+        const halfSquareSize = 40;
+        const x = e.clientX - halfSquareSize;
+        const y = e.clientY - halfSquareSize;
+
+        square.style.transform = `translate(${x}px, ${y}px) rotate(1turn)`;
+        square.style.borderRadius = "100%";
+      });
+
+      square.addEventListener("transitionend", () => {
+        square.style.transform = "";
+
+        square.style.borderRadius = 0;
+
+        square.textContent = "end";
+      });
+
+      square.addEventListener("transitionrun", () => {
+        square.textContent = "run";
+      });
+
+      square.addEventListener("transitionstart", () => {
+        square.textContent = "start";
+      });
+
+      square.addEventListener("transitioncancel", () => {
+        square.textContent = "cancel";
+      });
+    </script>
+  </body>
+</html>
