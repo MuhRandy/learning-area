@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation</title>
+
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 100vw;
+        min-height: 100vh;
+        background-color: skyblue;
+        display: flex;
+        justify-content: center;
+        overflow: clip;
+        animation: sky-when-sunset 4s ease-in-out 2s alternate infinite;
+      }
+
+      .sun {
+        width: 150px;
+        height: 150px;
+        border-radius: 100%;
+        background-color: orange;
+        animation: sunset 4s ease-in-out 2s alternate infinite;
+      }
+
+      @keyframes sunset {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(110vh);
+          background-color: red;
+        }
+      }
+
+      @keyframes sky-when-sunset {
+        to {
+          background-color: navy;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sun"></div>
+  </body>
+</html>

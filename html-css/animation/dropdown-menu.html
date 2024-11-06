@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown Menu</title>
+
+    <style>
+      .dropdown-container {
+        max-width: 250px;
+        margin: 40px auto;
+        text-align: center;
+        line-height: 50px;
+        font-size: 15px;
+        color: rgb(247, 247, 247);
+        cursor: pointer;
+      }
+
+      .menu-title {
+        background-color: rgb(163, 162, 162);
+      }
+
+      .dropdown-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background-color: rgb(99, 97, 97);
+        display: none;
+      }
+
+      ul.dropdown-menu li:hover {
+        background: rgb(47, 46, 46);
+      }
+
+      .visible {
+        display: block;
+        transform-origin: top;
+        animation: show-up 2s ease-in-out;
+        -webkit-animation: show-up 2s ease-in-out;
+      }
+
+      @keyframes show-up {
+        from {
+          transform: scaleY(0);
+          -webkit-transform: scaleY(0);
+          -moz-transform: scaleY(0);
+          -ms-transform: scaleY(0);
+          -o-transform: scaleY(0);
+        }
+        70% {
+          transform: scaleY(1.1);
+          -webkit-transform: scaleY(1.1);
+          -moz-transform: scaleY(1.1);
+          -ms-transform: scaleY(1.1);
+          -o-transform: scaleY(1.1);
+        }
+        to {
+          transform: scaleY(1);
+          -webkit-transform: scaleY(1);
+          -moz-transform: scaleY(1);
+          -ms-transform: scaleY(1);
+          -o-transform: scaleY(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dropdown-container">
+      <div class="menu-title">MENU</div>
+      <ul class="dropdown-menu">
+        <li>ITEM 1</li>
+        <li>ITEM 2</li>
+        <li>ITEM 3</li>
+        <li>ITEM 4</li>
+        <li>ITEM 5</li>
+      </ul>
+    </div>
+    <script>
+      const dropdownContainer = document.querySelector(".dropdown-container");
+      const menuTitle = document.querySelector(".menu-title");
+      const dropdownMenu = document.querySelector(".dropdown-menu");
+
+      menuTitle.addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) {
+          dropdownMenu.classList.toggle("visible");
+        }
+      });
+
+      window.addEventListener("click", (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+          dropdownMenu.classList.remove("visible");
+        }
+      });
+    </script>
+  </body>
+</html>
